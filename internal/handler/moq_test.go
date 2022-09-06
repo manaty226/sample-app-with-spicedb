@@ -18,7 +18,7 @@ var _ AddBlogService = &AddBlogServiceMock{}
 //
 // 		// make and configure a mocked AddBlogService
 // 		mockedAddBlogService := &AddBlogServiceMock{
-// 			AddBlogFunc: func(title string, content string) (entity.Blog, error) {
+// 			AddBlogFunc: func(title string, content string) (*entity.Blog, error) {
 // 				panic("mock out the AddBlog method")
 // 			},
 // 		}
@@ -29,7 +29,7 @@ var _ AddBlogService = &AddBlogServiceMock{}
 // 	}
 type AddBlogServiceMock struct {
 	// AddBlogFunc mocks the AddBlog method.
-	AddBlogFunc func(title string, content string) (entity.Blog, error)
+	AddBlogFunc func(title string, content string) (*entity.Blog, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -45,7 +45,7 @@ type AddBlogServiceMock struct {
 }
 
 // AddBlog calls AddBlogFunc.
-func (mock *AddBlogServiceMock) AddBlog(title string, content string) (entity.Blog, error) {
+func (mock *AddBlogServiceMock) AddBlog(title string, content string) (*entity.Blog, error) {
 	if mock.AddBlogFunc == nil {
 		panic("AddBlogServiceMock.AddBlogFunc: method is nil but AddBlogService.AddBlog was just called")
 	}
@@ -76,5 +76,70 @@ func (mock *AddBlogServiceMock) AddBlogCalls() []struct {
 	mock.lockAddBlog.RLock()
 	calls = mock.calls.AddBlog
 	mock.lockAddBlog.RUnlock()
+	return calls
+}
+
+// Ensure, that GetBlogServiceMock does implement GetBlogService.
+// If this is not the case, regenerate this file with moq.
+var _ GetBlogService = &GetBlogServiceMock{}
+
+// GetBlogServiceMock is a mock implementation of GetBlogService.
+//
+// 	func TestSomethingThatUsesGetBlogService(t *testing.T) {
+//
+// 		// make and configure a mocked GetBlogService
+// 		mockedGetBlogService := &GetBlogServiceMock{
+// 			GetBlogFunc: func(id int) (*entity.Blog, error) {
+// 				panic("mock out the GetBlog method")
+// 			},
+// 		}
+//
+// 		// use mockedGetBlogService in code that requires GetBlogService
+// 		// and then make assertions.
+//
+// 	}
+type GetBlogServiceMock struct {
+	// GetBlogFunc mocks the GetBlog method.
+	GetBlogFunc func(id int) (*entity.Blog, error)
+
+	// calls tracks calls to the methods.
+	calls struct {
+		// GetBlog holds details about calls to the GetBlog method.
+		GetBlog []struct {
+			// ID is the id argument value.
+			ID int
+		}
+	}
+	lockGetBlog sync.RWMutex
+}
+
+// GetBlog calls GetBlogFunc.
+func (mock *GetBlogServiceMock) GetBlog(id int) (*entity.Blog, error) {
+	if mock.GetBlogFunc == nil {
+		panic("GetBlogServiceMock.GetBlogFunc: method is nil but GetBlogService.GetBlog was just called")
+	}
+	callInfo := struct {
+		ID int
+	}{
+		ID: id,
+	}
+	mock.lockGetBlog.Lock()
+	mock.calls.GetBlog = append(mock.calls.GetBlog, callInfo)
+	mock.lockGetBlog.Unlock()
+	return mock.GetBlogFunc(id)
+}
+
+// GetBlogCalls gets all the calls that were made to GetBlog.
+// Check the length with:
+//     len(mockedGetBlogService.GetBlogCalls())
+func (mock *GetBlogServiceMock) GetBlogCalls() []struct {
+	ID int
+} {
+	var calls []struct {
+		ID int
+	}
+	mock.lockGetBlog.RLock()
+	calls = mock.calls.GetBlog
+	mock.lockGetBlog.RUnlock()
 	return calls
 }
