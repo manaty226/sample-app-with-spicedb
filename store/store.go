@@ -4,12 +4,10 @@ import (
 	"fmt"
 
 	"github.com/manaty226/sample-app-with-spicedb/internal/entity"
-	"github.com/manaty226/sample-app-with-spicedb/internal/service"
 )
 
 var (
-	_     service.BlogRepository = (*BlogStore)(nil)
-	Blogs                        = &BlogStore{Blogs: map[int64]*entity.Blog{}}
+	Blogs = &BlogStore{Blogs: map[int64]*entity.Blog{}}
 )
 
 type BlogStore struct {

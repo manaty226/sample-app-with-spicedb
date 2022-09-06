@@ -2,10 +2,7 @@ package service
 
 import (
 	"github.com/manaty226/sample-app-with-spicedb/internal/entity"
-	"github.com/manaty226/sample-app-with-spicedb/internal/handler"
 )
-
-var _ handler.GetBlogService = (*GetBlogService)(nil)
 
 type GetBlogService struct {
 	Store *BlogRepository
