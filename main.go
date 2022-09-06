@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/manaty226/sample-app-with-spicedb/internal/handler"
 	"github.com/manaty226/sample-app-with-spicedb/internal/service"
-	"github.com/manaty226/sample-app-with-spicedb/store"
+	"github.com/manaty226/sample-app-with-spicedb/internal/store"
 )
 
 func runner() *gin.Engine {
