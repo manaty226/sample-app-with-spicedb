@@ -18,11 +18,13 @@ func (a *AddBlog) Handle(c *gin.Context) {
 	var blog PostedBlog
 	if err := c.BindJSON(&blog); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	b, err := a.Service.AddBlog(blog.Title, blog.Content)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"id": b.ID})

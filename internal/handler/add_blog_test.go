@@ -44,11 +44,11 @@ func TestAddBlog(t *testing.T) {
 				bytes.NewReader(testutil.LoadFile(t, tt.reqFile)),
 			)
 			moq := &AddBlogServiceMock{}
-			moq.AddBlogFunc = func(title, content string) (entity.Blog, error) {
-				return entity.Blog{
+			moq.AddBlogFunc = func(title, content string) (*entity.Blog, error) {
+				return &entity.Blog{
 					ID:      1,
-					Title:   "test",
-					Content: "test",
+					Title:   title,
+					Content: content,
 				}, nil
 			}
 			sut := AddBlog{Service: moq}

@@ -1,11 +1,24 @@
 package service
 
-import "github.com/manaty226/sample-app-with-spicedb/internal/entity"
+import (
+	"github.com/manaty226/sample-app-with-spicedb/internal/entity"
+	"github.com/manaty226/sample-app-with-spicedb/internal/handler"
+)
+
+var _ handler.AddBlogService = (*AddBlogService)(nil)
 
 type AddBlogService struct {
-	Store map[string]*entity.Blog
+	Store *BlogRepository
 }
 
-func AddBlog(title, content string) (entity.Blog, error) {
-	return entity.Blog{}, nil
+func (a *AddBlogService) AddBlog(title, content string) (*entity.Blog, error) {
+	blog := &entity.Blog{
+		Title:   title,
+		Content: content,
+	}
+	err := (*a.Store).AddBlog(blog)
+	if err != nil {
+		return nil, err
+	}
+	return blog, nil
 }
