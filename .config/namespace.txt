@@ -1,0 +1,9 @@
+definition user{}
+
+definition blog {
+  relation reader: user | user:*
+  relation writer: user
+
+  permission write = writer
+  permission read = reader + writer
+}
