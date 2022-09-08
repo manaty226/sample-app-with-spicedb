@@ -1,13 +1,15 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 type AddBlog struct {
-	Service AddBlogService
+	Service    AddBlogService
+	Authorizer *Authorizer
 }
 type PostedBlog struct {
 	Title   string `json:"id" validate:"required"`
@@ -23,6 +25,16 @@ func (a *AddBlog) Handle(c *gin.Context) {
 
 	b, err := a.Service.AddBlog(blog.Title, blog.Content)
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	id := fmt.Sprintf("%d", b.ID)
+	user := c.MustGet(gin.AuthUserKey).(string)
+	if err := (*a.Authorizer).CreateUserPermission("blog", id, user, "writer"); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if err := (*a.Authorizer).CreateUserPermission("blog", id, user, "reader"); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

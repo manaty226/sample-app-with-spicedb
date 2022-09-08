@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -8,10 +9,22 @@ import (
 )
 
 type GetBlog struct {
-	Service GetBlogService
+	Service    GetBlogService
+	Authorizer *Authorizer
 }
 
 func (g GetBlog) Handle(c *gin.Context) {
+	user := c.MustGet(gin.AuthUserKey).(string)
+	ok, err := (*g.Authorizer).CheckPermission("blog", c.Param("id"), user, "GET")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if !ok {
+		c.JSON(http.StatusForbidden, gin.H{"error": fmt.Sprintf("not authorized to get the requested blog.")})
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
