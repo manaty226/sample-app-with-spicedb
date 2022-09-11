@@ -35,10 +35,15 @@ func runner() (*gin.Engine, error) {
 		Service:    &service.GetBlogService{Store: &blogs},
 		Authorizer: &authorizer,
 	}
+	u := handler.UpdateBlog{
+		Service:    &service.UpdateBlogService{Store: &blogs},
+		Authorizer: &authorizer,
+	}
 
 	authorized := r.Group("/", gin.BasicAuth(cfg.AuthnUsers))
 	authorized.POST("/blogs", a.Handle)
 	authorized.GET("/blogs/:id", g.Handle)
+	authorized.PUT("/blogs/:id", u.Handle)
 
 	return r, nil
 }
