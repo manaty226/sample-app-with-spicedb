@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-cmp/cmp"
 	"github.com/manaty226/sample-app-with-spicedb/internal/entity"
+	"github.com/manaty226/sample-app-with-spicedb/internal/service"
 	"github.com/manaty226/sample-app-with-spicedb/testutil"
 )
 
@@ -43,6 +44,8 @@ func TestAddBlog(t *testing.T) {
 				"/blogs",
 				bytes.NewReader(testutil.LoadFile(t, tt.reqFile)),
 			)
+			c.Set(gin.AuthUserKey, "test-user")
+
 			moq := &AddBlogServiceMock{}
 			moq.AddBlogFunc = func(title, content string) (*entity.Blog, error) {
 				return &entity.Blog{
@@ -51,7 +54,18 @@ func TestAddBlog(t *testing.T) {
 					Content: content,
 				}, nil
 			}
-			sut := AddBlog{Service: moq}
+			moqAuthz := AuthorizerMock{}
+			moqAuthz.CheckPermissionFunc = func(objectType string, objectId string, user string, method service.Method) (bool, error) {
+				return true, nil
+			}
+			moqAuthz.CreateUserPermissionFunc = func(objectType string, objectId string, user string, relation string) error {
+				return nil
+			}
+			authorizer := Authorizer(&moqAuthz)
+			sut := AddBlog{
+				Service:    moq,
+				Authorizer: &authorizer,
+			}
 			sut.Handle(c)
 			var got, want any
 			if err := json.Unmarshal(w.Body.Bytes(), &got); err != nil {

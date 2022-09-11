@@ -145,6 +145,83 @@ func (mock *GetBlogServiceMock) GetBlogCalls() []struct {
 	return calls
 }
 
+// Ensure, that UpdateBlogServiceMock does implement UpdateBlogService.
+// If this is not the case, regenerate this file with moq.
+var _ UpdateBlogService = &UpdateBlogServiceMock{}
+
+// UpdateBlogServiceMock is a mock implementation of UpdateBlogService.
+//
+// 	func TestSomethingThatUsesUpdateBlogService(t *testing.T) {
+//
+// 		// make and configure a mocked UpdateBlogService
+// 		mockedUpdateBlogService := &UpdateBlogServiceMock{
+// 			UpdateBlogFunc: func(id int, title string, content string) (*entity.Blog, error) {
+// 				panic("mock out the UpdateBlog method")
+// 			},
+// 		}
+//
+// 		// use mockedUpdateBlogService in code that requires UpdateBlogService
+// 		// and then make assertions.
+//
+// 	}
+type UpdateBlogServiceMock struct {
+	// UpdateBlogFunc mocks the UpdateBlog method.
+	UpdateBlogFunc func(id int, title string, content string) (*entity.Blog, error)
+
+	// calls tracks calls to the methods.
+	calls struct {
+		// UpdateBlog holds details about calls to the UpdateBlog method.
+		UpdateBlog []struct {
+			// ID is the id argument value.
+			ID int
+			// Title is the title argument value.
+			Title string
+			// Content is the content argument value.
+			Content string
+		}
+	}
+	lockUpdateBlog sync.RWMutex
+}
+
+// UpdateBlog calls UpdateBlogFunc.
+func (mock *UpdateBlogServiceMock) UpdateBlog(id int, title string, content string) (*entity.Blog, error) {
+	if mock.UpdateBlogFunc == nil {
+		panic("UpdateBlogServiceMock.UpdateBlogFunc: method is nil but UpdateBlogService.UpdateBlog was just called")
+	}
+	callInfo := struct {
+		ID      int
+		Title   string
+		Content string
+	}{
+		ID:      id,
+		Title:   title,
+		Content: content,
+	}
+	mock.lockUpdateBlog.Lock()
+	mock.calls.UpdateBlog = append(mock.calls.UpdateBlog, callInfo)
+	mock.lockUpdateBlog.Unlock()
+	return mock.UpdateBlogFunc(id, title, content)
+}
+
+// UpdateBlogCalls gets all the calls that were made to UpdateBlog.
+// Check the length with:
+//     len(mockedUpdateBlogService.UpdateBlogCalls())
+func (mock *UpdateBlogServiceMock) UpdateBlogCalls() []struct {
+	ID      int
+	Title   string
+	Content string
+} {
+	var calls []struct {
+		ID      int
+		Title   string
+		Content string
+	}
+	mock.lockUpdateBlog.RLock()
+	calls = mock.calls.UpdateBlog
+	mock.lockUpdateBlog.RUnlock()
+	return calls
+}
+
 // Ensure, that AuthorizerMock does implement Authorizer.
 // If this is not the case, regenerate this file with moq.
 var _ Authorizer = &AuthorizerMock{}

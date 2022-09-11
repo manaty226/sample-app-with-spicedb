@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-cmp/cmp"
 	"github.com/manaty226/sample-app-with-spicedb/internal/entity"
+	"github.com/manaty226/sample-app-with-spicedb/internal/service"
 )
 
 func TestGetBlog(t *testing.T) {
@@ -52,6 +53,7 @@ func TestGetBlog(t *testing.T) {
 				fmt.Sprintf("/blogs/%d", tt.path),
 				bytes.NewReader([]byte("")),
 			)
+			c.Set(gin.AuthUserKey, "test-user")
 			moq := &GetBlogServiceMock{}
 			moq.GetBlogFunc = func(id int) (*entity.Blog, error) {
 				return &entity.Blog{
@@ -60,7 +62,15 @@ func TestGetBlog(t *testing.T) {
 					Content: "test",
 				}, nil
 			}
-			sut := GetBlog{Service: moq}
+			moqAuthz := AuthorizerMock{}
+			moqAuthz.CheckPermissionFunc = func(objectType string, objectId string, user string, method service.Method) (bool, error) {
+				return true, nil
+			}
+			authorizer := Authorizer(&moqAuthz)
+			sut := GetBlog{
+				Service:    moq,
+				Authorizer: &authorizer,
+			}
 			sut.Handle(c)
 			var got, want any
 			if err := json.Unmarshal(w.Body.Bytes(), &got); err != nil {

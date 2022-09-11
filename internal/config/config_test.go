@@ -14,5 +14,5 @@ func TestConfig(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, "127.0.0.1", cfg.SpiceHost)
-	require.Equal(t, 3000, cfg.SpicePort)
+	require.Equal(t, 3001, cfg.SpicePort)
 }
