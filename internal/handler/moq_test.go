@@ -5,6 +5,7 @@ package handler
 
 import (
 	"github.com/manaty226/sample-app-with-spicedb/internal/entity"
+	"github.com/manaty226/sample-app-with-spicedb/internal/service"
 	"sync"
 )
 
@@ -141,5 +142,149 @@ func (mock *GetBlogServiceMock) GetBlogCalls() []struct {
 	mock.lockGetBlog.RLock()
 	calls = mock.calls.GetBlog
 	mock.lockGetBlog.RUnlock()
+	return calls
+}
+
+// Ensure, that AuthorizerMock does implement Authorizer.
+// If this is not the case, regenerate this file with moq.
+var _ Authorizer = &AuthorizerMock{}
+
+// AuthorizerMock is a mock implementation of Authorizer.
+//
+// 	func TestSomethingThatUsesAuthorizer(t *testing.T) {
+//
+// 		// make and configure a mocked Authorizer
+// 		mockedAuthorizer := &AuthorizerMock{
+// 			CheckPermissionFunc: func(objectType string, objectId string, user string, method service.Method) (bool, error) {
+// 				panic("mock out the CheckPermission method")
+// 			},
+// 			CreateUserPermissionFunc: func(objectType string, objectId string, user string, relation string) error {
+// 				panic("mock out the CreateUserPermission method")
+// 			},
+// 		}
+//
+// 		// use mockedAuthorizer in code that requires Authorizer
+// 		// and then make assertions.
+//
+// 	}
+type AuthorizerMock struct {
+	// CheckPermissionFunc mocks the CheckPermission method.
+	CheckPermissionFunc func(objectType string, objectId string, user string, method service.Method) (bool, error)
+
+	// CreateUserPermissionFunc mocks the CreateUserPermission method.
+	CreateUserPermissionFunc func(objectType string, objectId string, user string, relation string) error
+
+	// calls tracks calls to the methods.
+	calls struct {
+		// CheckPermission holds details about calls to the CheckPermission method.
+		CheckPermission []struct {
+			// ObjectType is the objectType argument value.
+			ObjectType string
+			// ObjectId is the objectId argument value.
+			ObjectId string
+			// User is the user argument value.
+			User string
+			// Method is the method argument value.
+			Method service.Method
+		}
+		// CreateUserPermission holds details about calls to the CreateUserPermission method.
+		CreateUserPermission []struct {
+			// ObjectType is the objectType argument value.
+			ObjectType string
+			// ObjectId is the objectId argument value.
+			ObjectId string
+			// User is the user argument value.
+			User string
+			// Relation is the relation argument value.
+			Relation string
+		}
+	}
+	lockCheckPermission      sync.RWMutex
+	lockCreateUserPermission sync.RWMutex
+}
+
+// CheckPermission calls CheckPermissionFunc.
+func (mock *AuthorizerMock) CheckPermission(objectType string, objectId string, user string, method service.Method) (bool, error) {
+	if mock.CheckPermissionFunc == nil {
+		panic("AuthorizerMock.CheckPermissionFunc: method is nil but Authorizer.CheckPermission was just called")
+	}
+	callInfo := struct {
+		ObjectType string
+		ObjectId   string
+		User       string
+		Method     service.Method
+	}{
+		ObjectType: objectType,
+		ObjectId:   objectId,
+		User:       user,
+		Method:     method,
+	}
+	mock.lockCheckPermission.Lock()
+	mock.calls.CheckPermission = append(mock.calls.CheckPermission, callInfo)
+	mock.lockCheckPermission.Unlock()
+	return mock.CheckPermissionFunc(objectType, objectId, user, method)
+}
+
+// CheckPermissionCalls gets all the calls that were made to CheckPermission.
+// Check the length with:
+//     len(mockedAuthorizer.CheckPermissionCalls())
+func (mock *AuthorizerMock) CheckPermissionCalls() []struct {
+	ObjectType string
+	ObjectId   string
+	User       string
+	Method     service.Method
+} {
+	var calls []struct {
+		ObjectType string
+		ObjectId   string
+		User       string
+		Method     service.Method
+	}
+	mock.lockCheckPermission.RLock()
+	calls = mock.calls.CheckPermission
+	mock.lockCheckPermission.RUnlock()
+	return calls
+}
+
+// CreateUserPermission calls CreateUserPermissionFunc.
+func (mock *AuthorizerMock) CreateUserPermission(objectType string, objectId string, user string, relation string) error {
+	if mock.CreateUserPermissionFunc == nil {
+		panic("AuthorizerMock.CreateUserPermissionFunc: method is nil but Authorizer.CreateUserPermission was just called")
+	}
+	callInfo := struct {
+		ObjectType string
+		ObjectId   string
+		User       string
+		Relation   string
+	}{
+		ObjectType: objectType,
+		ObjectId:   objectId,
+		User:       user,
+		Relation:   relation,
+	}
+	mock.lockCreateUserPermission.Lock()
+	mock.calls.CreateUserPermission = append(mock.calls.CreateUserPermission, callInfo)
+	mock.lockCreateUserPermission.Unlock()
+	return mock.CreateUserPermissionFunc(objectType, objectId, user, relation)
+}
+
+// CreateUserPermissionCalls gets all the calls that were made to CreateUserPermission.
+// Check the length with:
+//     len(mockedAuthorizer.CreateUserPermissionCalls())
+func (mock *AuthorizerMock) CreateUserPermissionCalls() []struct {
+	ObjectType string
+	ObjectId   string
+	User       string
+	Relation   string
+} {
+	var calls []struct {
+		ObjectType string
+		ObjectId   string
+		User       string
+		Relation   string
+	}
+	mock.lockCreateUserPermission.RLock()
+	calls = mock.calls.CreateUserPermission
+	mock.lockCreateUserPermission.RUnlock()
 	return calls
 }
