@@ -43,13 +43,24 @@ func (s spiceClient) CreateNameSpace(schema string) error {
 func (s spiceClient) CheckPermission(object, subject entity.Object, action entity.Action) (bool, error) {
 	obj := &pb.ObjectReference{ObjectType: string(object.Type), ObjectId: object.ID}
 	sub := &pb.SubjectReference{Object: &pb.ObjectReference{ObjectType: string(subject.Type), ObjectId: subject.ID}}
-	resp, err := s.client.CheckPermission(context.Background(), &pb.CheckPermissionRequest{
-		Resource:   obj,
-		Permission: string(action),
-		Subject:    sub,
-		Consistency: &v1.Consistency{
+
+	// Set consistency level. When no ZedToken exists, must set not to use the ZedToken.
+	var consistency *v1.Consistency
+	if s.zedToken == nil {
+		consistency = &v1.Consistency{
+			Requirement: &v1.Consistency_FullyConsistent{FullyConsistent: true},
+		}
+	} else {
+		consistency = &v1.Consistency{
 			Requirement: &v1.Consistency_AtLeastAsFresh{AtLeastAsFresh: s.zedToken},
-		},
+		}
+	}
+
+	resp, err := s.client.CheckPermission(context.Background(), &pb.CheckPermissionRequest{
+		Resource:    obj,
+		Permission:  string(action),
+		Subject:     sub,
+		Consistency: consistency,
 	})
 	if err != nil {
 		return false, err
@@ -63,7 +74,7 @@ func (s *spiceClient) CreateRelation(object, subject entity.Object, relation str
 	sub := &pb.SubjectReference{Object: &pb.ObjectReference{ObjectType: string(subject.Type), ObjectId: subject.ID}}
 	request := &pb.WriteRelationshipsRequest{Updates: []*pb.RelationshipUpdate{
 		{
-			Operation: pb.RelationshipUpdate_OPERATION_CREATE,
+			Operation: pb.RelationshipUpdate_OPERATION_TOUCH,
 			Relationship: &pb.Relationship{
 				Resource: obj,
 				Relation: relation,
