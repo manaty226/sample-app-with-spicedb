@@ -14,6 +14,7 @@ type GetBlog struct {
 }
 
 func (g GetBlog) Handle(c *gin.Context) {
+	// Check authorization to get blog
 	user := c.MustGet(gin.AuthUserKey).(string)
 	ok, err := (*g.Authorizer).CheckPermission("blog", c.Param("id"), user, "GET")
 	if err != nil {
@@ -31,6 +32,7 @@ func (g GetBlog) Handle(c *gin.Context) {
 		return
 	}
 
+	// Get blog from store
 	b, err := g.Service.GetBlog(id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

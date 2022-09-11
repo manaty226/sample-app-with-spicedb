@@ -12,7 +12,7 @@ type AddBlog struct {
 	Authorizer *Authorizer
 }
 type PostedBlog struct {
-	Title   string `json:"id" validate:"required"`
+	Title   string `json:"title" validate:"required"`
 	Content string `json:"content" validate:"required"`
 }
 
@@ -23,18 +23,21 @@ func (a *AddBlog) Handle(c *gin.Context) {
 		return
 	}
 
+	// Add blog to store
 	b, err := a.Service.AddBlog(blog.Title, blog.Content)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	// Set authorization user
 	id := fmt.Sprintf("%d", b.ID)
 	user := c.MustGet(gin.AuthUserKey).(string)
 	if err := (*a.Authorizer).CreateUserPermission("blog", id, user, "writer"); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	if err := (*a.Authorizer).CreateUserPermission("blog", id, user, "reader"); err != nil {
+	if err := (*a.Authorizer).CreateUserPermission("blog", id, "*", "reader"); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
